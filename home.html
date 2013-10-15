@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+    <title>Supertable</title>
+
+    <!-- CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/select2.css" rel="stylesheet">
+    <link href="css/jq.css" rel="stylesheet">
+    <link href="css/theme.jui.css" rel="stylesheet">
+    <link class="ui-theme" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/cupertino/jquery-ui.css">
+
+    <!-- JS -->
+    <script type="text/javascript" src="jquery-1.10.2.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="select2.min.js"></script>
+    <script type="text/javascript" src="jquery.tablesorter.widgets.js"></script>
+
+
+  </head>
+
+
+    <h1>Supertable</h1>
+
+ <table class="tablesorter">
+  <thead>
+    <tr>
+      <th colspan="3">name</th>
+      <th colspan="5">features</th>
+    </tr>
+    <tr>
+        <th class="filter-select"><a href='#' onclick='overlay()'>prefix</a></th> 
+        <th ><a href='#' onclick='overlay()'>first</a></th>
+        <th><a href='#' onclick='overlay()'>last</a></th>
+        <th><a href='#' onclick='overlay()'>gender</a></th>
+        <th><a href='#' onclick='overlay()'>height</a></th>
+        <th><a href='#' onclick='overlay()'>weight</a></th>
+        <th><a href='#' onclick='overlay()'>age</a></th>
+        <th><a href='#' onclick='overlay()'>has_nose</a></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr> 
+        <td>Mr.</td> 
+        <td>Harry</td> 
+        <td>Potter</td> 
+        <td>m</td> 
+        <td>70</td> 
+        <td>140</td> 
+        <td>19</td> 
+        <td>TRUE</td> 
+    </tr> 
+    <tr> 
+        <td>Ms.</td> 
+        <td>Hermione</td> 
+        <td>Granger</td> 
+        <td>f</td> 
+        <td>66</td> 
+        <td>121</td> 
+        <td>19</td> 
+        <td>TRUE</td>     
+    </tr> 
+    <tr> 
+        <td></td> 
+        <td>Dobby</td> 
+        <td></td> 
+        <td>m</td> 
+        <td>23</td> 
+        <td>20</td> 
+        <td>284</td> 
+        <td>TRUE</td> 
+    </tr> 
+    <tr> 
+        <td>Dark Lord</td> 
+        <td>Tom</td> 
+        <td>Riddle</td> 
+        <td>m</td> 
+        <td>74</td> 
+        <td>144</td> 
+        <td>48</td> 
+        <td>FALSE</td> 
+    </tr>   </tbody>
+</table>
+
+
+// modal dialog box
+<div id="overlay">
+<div>
+Filter
+<a href="javascript:close()">Close</a>
+</div>
+</div>
+
+
+<table id="external_controls">
+    <tbody>
+        <tr><td class="select2">prefix: </td></tr>
+        <tr><td class="select2">first name: </td></tr>
+        <tr><td class="select2">last name: </td></tr>
+        <tr><input type="search" placeholder="num1" /></tr>
+        <tr><input type="search" placeholder="num2" /></tr>
+        <tr><input type="search" placeholder="num3" /></tr>
+    </tbody>
+</table>
+
+
+    <script>
+
+    // from this: http://mottie.github.io/tablesorter/beta-testing/example-external-filters-using-select2.html
+
+    $(function(){
+      var $t = $('table')
+        .on('filterInit', function () {
+
+          var filters,
+          select2Column = 0,
+          $t = $(this),
+          $filterCells = $t.find('.tablesorter-filter-row').children(),
+          $ext = $('#external_controls'),
+          $extCells = $ext.find('td'),
+          startSearch = function(){
+            filters = [];
+            $extCells.each(function(i){
+              var v,
+              $this = $(this),
+              $item = $this.find('select, input');
+              // specific method for select2
+              if (i === select2Column) {
+                v = '/(' + ($this.find('.selector').select2('val') || []).join('$|') + '$)/';
+              }
+              if (i !== select2Column) {
+                // search for numbers > value
+                // v = '>=' + $item.val();
+              }
+              filters[i] = v || $item.val() || '';
+            });
+            // start search
+            $.tablesorter.setFilters($t, filters, true);
+          };
+
+          // hide filter row completely
+          $t.find('.tablesorter-filter-row').hide();
+
+          // clone original select and turn it into a select2
+          // doing it this way because we can let the filter widget do most of the work
+          $filterCells.eq(select2Column)
+            .find('select')
+            .attr('multiple', 'multiple')
+            .addClass('selector')
+            .appendTo( $ext.find('.select2') );
+          // replace select with an input
+          $filterCells.eq(select2Column).html('<input type="search" class="tablesorter-filter">');
+          // turn off built-in filter-select
+          $t.find('.filter-select').removeClass('filter-select') // turn off filter select
+          this.config.widgetOptions.filter_functions[select2Column] = null;
+          // removed first option (it's just a placeholder)
+          $ext.find('.selector').find('option:first').remove();
+          // set up select2 input
+          $ext.find('.selector').select2();
+
+          // input changes trigger a new search
+          $ext.find('select, input').on('change', function () {
+            startSearch();
+          });
+
+        })
+        .tablesorter({
+          theme: 'jui',
+          headerTemplate: '{content}{icon}',
+          widgets: ['zebra', 'filter']
+        });
+
+      });
+
+
+    // from this: http://stackoverflow.com/questions/12411136/javascript-modal-dialog
+    function overlay(){
+        el = document.getElementById("overlay");
+        el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+    }
+    function close() {
+        document.getElementById("overlay").style.visibility = 'hidden';
+    }
+    </script>
+
+  </body>
+
+</html>
+

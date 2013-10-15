@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Supertable",
+  "version": "1.0.0",
+  "description": "table with sortable columns",
+  "browser_action": {
+    "default_title": "Supertable"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "js": ["jquery.tablesorter.widgets.js", "lib/jquery-1.10.2.min.js", "lib/tablesorter/js/jquery.tablesorter.min.js", "lib/select2-3.4.3/select2.min.js", "lib/select2-3.4.3/select2.js" ]
+    }
+  ]
+}
+
